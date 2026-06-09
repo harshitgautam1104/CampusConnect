@@ -25,7 +25,7 @@ const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173", // Local testing ke liye
-        "idyllic-faun-9e86c2.netlify.app" // APNA NETLIFY LINK YAHAN DALO
+        "https://idyllic-faun-9e86c2.netlify.app" // APNA NETLIFY LINK YAHAN DALO
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
