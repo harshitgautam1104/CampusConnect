@@ -1,27 +1,32 @@
 const Discussion = require('../models/Discussion');
 
-// 1. Post a new message
-exports.createPost = async (req, res) => {
+// 1. Like/Unlike Post
+exports.toggleLike = async (req, res) => {
     try {
-        const post = new Discussion({
-            user: req.user.id,
-            content: req.body.content
-        });
+        const post = await Discussion.findById(req.params.id);
+        if (post.likes.includes(req.user.id)) {
+            // Agar pehle se like hai toh remove karo
+            post.likes = post.likes.filter(id => id.toString() !== req.user.id);
+        } else {
+            // Warna add karo
+            post.likes.push(req.user.id);
+        }
         await post.save();
-        res.status(201).json(post);
-    } catch (error) {
-        res.status(500).json({ message: "Error creating post" });
-    }
+        res.json(post);
+    } catch (error) { res.status(500).json({ message: "Error" }); }
 };
 
-// 2. Get all posts
-exports.getPosts = async (req, res) => {
+// 2. Reply to Post
+exports.addReply = async (req, res) => {
     try {
-        const posts = await Discussion.find()
-            .populate('user', 'name role')
-            .sort({ createdAt: -1 });
-        res.json(posts);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching posts" });
-    }
+        const post = await Discussion.findById(req.params.id);
+        const reply = {
+            user: req.user.id,
+            userName: req.user.name,
+            text: req.body.text
+        };
+        post.replies.push(reply);
+        await post.save();
+        res.json(post);
+    } catch (error) { res.status(500).json({ message: "Error" }); }
 };
